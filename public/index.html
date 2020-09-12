@@ -5,15 +5,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
+<style>
+  form { padding: 20px; position: fixed; bottom: 0; }
+  ul li { color: black; }
+</style>
+
   <body>
+    <center><p id="userstatusdiv"></p></center>
+    <!-- Front end for chat app -->
+    <div class="chatboxcontainer" style="width: 100%;background-color: grey;color:black">
+      <div class="row" style="width: 100%">
+        <div id="usernames"><div id="messages"></div></div>
+        
+      </div>
+      <div class="row">
+        <form action="">
+          <input id="username" type="text" autocomplete="off" placeholder="Username">
+          <input id="m" type="text" autocomplete="off" placeholder="Message...">
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+
+    <!--Loaded this JQuery library for getting values from front-end with its functions to integrate with socket.io -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   	<script src="/socket.io/socket.io.js"></script>
+
   	<script>
-  		const socket = io.connect('http://localhost:3000');
-  		socket.on('message', (data) => {
-  			console.log(data);
-  			socket.emit('another event', { Client: 'I am great thank you'});
-  		})
+  		var socket = io();
+
+      socket.on('connect', () => {
+        // Emitting to everybody
+        socket.emit('userstatus', 'New user joined');
+      })
+      socket.on('userstatusreciever', (status) => {
+        $('#userstatusdiv').append($('<h1>').text(status));
+      })
+
+      // when form is submitted with message, the socket will emit.
+  		$('form').submit(() => {
+        // take the input #m from the front-end emit it to server
+      
+        socket.emit('username', $('#username').val());
+        socket.emit('message', $('#m').val());
+        // after emiting the value in the #m should be emptied. that is done below.
+        $('#m').val('');
+        return false;
+      });
+
+
+      socket.on('username', (username) => {
+        // through appending the message in the #messages ul component in the browser
+        $('#usernames').append($('<p>').text(username));
+      });
+
+      // when the server recieves a , message the server will broadcast it. Just like below
+      socket.on('message', (msg) => {
+        // through appending the message in the #messages ul component in the browser
+        $('#messages').append($('<p>').text(msg));
+      });
+
+      
+
   	</script>
 
   </body>
 </html>
+

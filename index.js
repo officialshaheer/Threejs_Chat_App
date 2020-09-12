@@ -12,9 +12,24 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-	console.log('user connected');
-	socket.emit('message', { Server: 'hey how are you?'});
-	socket.on('another event', (data) => {
-		console.log(data);
-	})
+
+	// Starting Socket when a user entered the url
+	socket.on('userstatus', (status) => {
+		io.emit('userstatusreciever', status);
+	});
+
+	socket.on('username', (username) => {
+		// console.log('message: ' + msg );
+		io.emit('username', username);
+	});
+
+	socket.on('message', (msg) => {
+		// console.log('message: ' + msg );
+		io.emit('message', msg);
+	});
+
+	socket.on('disconnect', () => {
+		// console.log('user disconnected');
+		io.emit('message', 'user disconnected');
+	});
 })

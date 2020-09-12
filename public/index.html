@@ -43,7 +43,7 @@
       })
 
       // when form is submitted with message, the socket will emit.
-  		$('form').submit(() => {
+  		$('form').keyup(() => {
         // take the input #m from the front-end emit it to server
       
         socket.emit('username', $('#username').val());
@@ -56,7 +56,7 @@
 
       socket.on('username', (username) => {
         // through appending the message in the #messages ul component in the browser
-        $('#usernames').append($('<p>').text(username));
+        $('#usernames').html($('<p>').text(username));
       });
 
       // when the server recieves a , message the server will broadcast it. Just like below
